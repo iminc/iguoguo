@@ -11,8 +11,15 @@ import {
   Text,
   View
 } from 'react-native';
+import SplashScreen from 'react-native-splash-screen'
 
 export default class iguoguo extends Component {
+  componentDidMount() {
+    setTimeout(_ => {
+      SplashScreen.hide()
+    }, 3000)
+  }
+
   render() {
     return (
       <View style={styles.container}>
