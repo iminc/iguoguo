@@ -1,0 +1,9 @@
+{
+    "extends": ["standard", "plugin:react/recommended"],
+    "parser": "babel-eslint",
+    "rules": {
+        "space-before-function-paren": "off",
+        "comma-dangle": "off",
+        "react/prop-types": "off"
+    }
+}
