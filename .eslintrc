@@ -4,6 +4,10 @@
     "rules": {
         "space-before-function-paren": "off",
         "comma-dangle": "off",
-        "react/prop-types": "off"
+        "react/prop-types": "off",
+        "indent": ["error", 4]
+    },
+    "env": {
+        "browser": true
     }
 }
