@@ -6,8 +6,8 @@ import {
     Image,
     FlatList,
     Animated,
+    InteractionManager,
     TouchableHighlight,
-    TouchableNativeFeedback,
 } from 'react-native'
 
 import { TabNavigator } from 'react-navigation'
@@ -26,14 +26,16 @@ class TopicList extends React.PureComponent {
     _keyExtractor = (item, index) => item.id
 
     componentDidMount() {
-        service.getTopicListByType('all')
-            .then(res => {
-                alert(res.data.length)
-                this.setState({
-                    data: this.state.data.concat(res.data),
-                    refreshing: false,
+        InteractionManager.runAfterInteractions(() => {
+            const { key } = this.props.navigation.state
+            service.getTopicListByType(key.toLowerCase())
+                .then(res => {
+                    this.setState({
+                        data: this.state.data.concat(res.data),
+                        refreshing: false,
+                    })
                 })
-            })
+        })
     }
 
     _renderItem({ item }) {
@@ -143,23 +145,12 @@ export default TabNavigator({
     Job: {
         screen: TopicList,
         navigationOptions: () => ({
-            tabBarLabel: '招聘'
+            tabBarLabel: '招聘',
         })
     },
 }, {
     lazy: true,
-    tabBarPosition: 'bottom',
-    tabBarOptions: {
-        inactiveTintColor: 'white',
-        inactiveBackgroundColor: 'white',
-        indicatorStyle: {
-            backgroundColor: 'white',
-            color: 'white',
-        },
-        style: {
-            backgroundColor: '#444'
-        },
-    }
+    tabBarComponent: () => null,
 })
 
 const styles = StyleSheet.create({

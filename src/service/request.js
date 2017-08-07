@@ -6,6 +6,7 @@ function thenJSON(res) {
 
 function thenCatch(err) {
     alert(`Network error...${err}`)
+    throw new Error(err)
 }
 
 export default {
