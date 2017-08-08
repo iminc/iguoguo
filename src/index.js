@@ -26,6 +26,10 @@ const Navigator = StackNavigator({
         screen: CNode,
         navigationOptions: ({navigation}) => ({
             title: 'CNode',
+            headerStyle: {
+                backgroundColor: '#444',
+                elevation: 0,
+            },
         })
     },
 }, {

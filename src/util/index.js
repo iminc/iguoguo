@@ -85,9 +85,42 @@ function randomColor() {
     return colors[Math.floor(Math.random() * colors.length)]
 }
 
+function getTip({ good, top, tab }) {
+    let tipText = ''
+    let tipColor = ''
+
+    if (good) {
+        tipText = '精华'
+        tipColor = '#e67e22'
+    } else if (top) {
+        tipText = '置顶'
+        tipColor = '#e74c3c'
+    } else {
+        if (tab === 'share') {
+            tipText = '分享'
+            tipColor = '#1abc9c'
+        } else if (tab === 'job') {
+            tipText = '招聘'
+            tipColor = '#9b59b6'
+        } else if (tab === 'ask') {
+            tipText = '问答'
+            tipColor = '#3498db'
+        } else {
+            tipText = '问答'
+            tipColor = '#3498db'
+        }
+    }
+
+    return {
+        tipText,
+        tipColor,
+    }
+}
+
 export default {
     parseTime,
     parseUrl,
     isUrl,
     randomColor,
+    getTip,
 }

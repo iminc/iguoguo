@@ -10,7 +10,8 @@ import {
     TouchableHighlight,
 } from 'react-native'
 
-import { TabNavigator } from 'react-navigation'
+import ScrollableTabView, { DefaultTabBar } from 'react-native-scrollable-tab-view'
+import _ from 'lodash'
 import Utils from '../util'
 import service from '../service/cnode'
 
@@ -27,48 +28,25 @@ class TopicList extends React.PureComponent {
 
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
-            const { key } = this.props.navigation.state
-            service.getTopicListByType(key.toLowerCase())
-                .then(res => {
-                    this.setState({
-                        data: this.state.data.concat(res.data),
-                        refreshing: false,
-                    })
+            service.getTopics({
+                tab: this.props.tab.toLowerCase(),
+            }).then(res => {
+                this.setState({
+                    data: this.state.data.concat(res.data),
+                    refreshing: false,
                 })
+            })
         })
     }
 
     _renderItem({ item }) {
-        let tipText = ''
-        let tipColor = ''
+        const { tipText, tipColor } = Utils.getTip(item)
         const avatar = Utils.parseUrl(item.author.avatar_url)
-
-        if (item.good) {
-            tipText = '精华'
-            tipColor = '#e67e22'
-        } else if (item.top) {
-            tipText = '置顶'
-            tipColor = '#e74c3c'
-        } else {
-            if (item.tab === 'share') {
-                tipText = '分享'
-                tipColor = '#1abc9c'
-            } else if (item.tab === 'job') {
-                tipText = '招聘'
-                tipColor = '#9b59b6'
-            } else if (item.tab === 'ask') {
-                tipText = '问答'
-                tipColor = '#3498db'
-            } else {
-                tipText = '问答'
-                tipColor = '#3498db'
-            }
-        }
 
         return (
             <TouchableHighlight
                 underlayColor='#F5FCFF'
-                onPress={() => this.onPress(item.id, item)}>
+                onPress={() => this._onPress(item.id, item)}>
                 <View style={styles.item}>
                     <View style={styles.titleContainer}>
                         <View style={[styles.tipContainer, { backgroundColor: tipColor }]}>
@@ -101,13 +79,32 @@ class TopicList extends React.PureComponent {
         )
     }
 
-    _onRefresh = () => alert('onRefresh: nothing to refresh :P')
+    _onPress = (item) => {
+        alert('onPress...')
+    }
+
+    _onRefresh = () => {
+        this.setState({ refreshing: true })
+
+        InteractionManager.runAfterInteractions(() => {
+            service.getTopics({
+                tab: this.props.tab.toLowerCase(),
+            }).then(res => {
+                this.setState({
+                    data: res.data,
+                    refreshing: false,
+                })
+            })
+        })
+    }
 
     render() {
         return (
             <AnimatedFlatList
                 data={this.state.data}
-                extraData={this.state}
+                debug={false}
+                numColumns={1}
+                legacyImplementation={false}
                 keyExtractor={this._keyExtractor}
                 renderItem={this._renderItem}
                 refreshing={this.state.refreshing}
@@ -117,41 +114,31 @@ class TopicList extends React.PureComponent {
     }
 }
 
-export default TabNavigator({
-    All: {
-        screen: TopicList,
-        navigationOptions: () => ({
-            tabBarLabel: '全部'
-        })
-    },
-    Good: {
-        screen: TopicList,
-        navigationOptions: () => ({
-            tabBarLabel: '精华'
-        })
-    },
-    Ask: {
-        screen: TopicList,
-        navigationOptions: () => ({
-            tabBarLabel: '问答'
-        })
-    },
-    Share: {
-        screen: TopicList,
-        navigationOptions: () => ({
-            tabBarLabel: '分享'
-        })
-    },
-    Job: {
-        screen: TopicList,
-        navigationOptions: () => ({
-            tabBarLabel: '招聘',
-        })
-    },
-}, {
-    lazy: true,
-    tabBarComponent: () => null,
-})
+export default class Tab extends React.Component {
+    renderTopics() {
+        return _.map({
+            all: '全部',
+            good: '精华',
+            ask: '问答',
+            share: '分享',
+            job: '招聘',
+        }, (value, key) => <TopicList tab={key} tabLabel={value} />)
+    }
+
+    render() {
+        return (
+            <ScrollableTabView
+                scrollWithoutAnimation={true}
+                tabBarBackgroundColor="#444"
+                tabBarActiveTextColor="#FFF"
+                tabBarInactiveTextColor="#FFF"
+                tabBarUnderlineStyle={styles.underline}
+                renderTabBar={() => <DefaultTabBar style={{ elevation: 4 }} />}>
+                {this.renderTopics()}
+            </ScrollableTabView>
+        )
+    }
+}
 
 const styles = StyleSheet.create({
     nav: {
@@ -163,7 +150,7 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 20,
         borderBottomWidth: 1,
-        borderColor: '#F1F1F1',
+        borderColor: '#F8F8F8',
     },
     titleContainer: {
         minHeight: 45,
@@ -203,5 +190,8 @@ const styles = StyleSheet.create({
     },
     right: {
         alignSelf: 'flex-end',
+    },
+    underline: {
+        backgroundColor: '#F8F8F8',
     },
 })

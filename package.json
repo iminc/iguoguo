@@ -5,14 +5,18 @@
 	"scripts": {
 		"start": "node node_modules/react-native/local-cli/cli.js start",
 		"android": "kill -9 $(lsof -i:8081|tail -1|awk '\"$1\"!=\"\"{print $2}') & react-native run-android",
+		"build": "cd android && ./gradlew installRelease",
 		"test": "jest"
 	},
 	"dependencies": {
+		"lodash": "^4.17.4",
 		"mobx": "^3.2.2",
 		"mobx-react": "^4.2.2",
+		"moment": "^2.18.1",
 		"qs": "^6.5.0",
 		"react": "16.0.0-alpha.12",
 		"react-native": "0.47.1",
+		"react-native-scrollable-tab-view": "^0.6.7",
 		"react-native-splash-screen": "git+https://github.com/iminc/react-native-splash-screen.git",
 		"react-navigation": "^1.0.0-beta.11"
 	},
