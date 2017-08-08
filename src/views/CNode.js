@@ -39,14 +39,14 @@ class TopicList extends React.PureComponent {
         })
     }
 
-    _renderItem({ item }) {
+    _renderItem = ({ item }) => {
         const { tipText, tipColor } = Utils.getTip(item)
         const avatar = Utils.parseUrl(item.author.avatar_url)
 
         return (
             <TouchableHighlight
                 underlayColor='#F5FCFF'
-                onPress={() => this._onPress(item.id, item)}>
+                onPress={() => this._onPress(item)}>
                 <View style={styles.item}>
                     <View style={styles.titleContainer}>
                         <View style={[styles.tipContainer, { backgroundColor: tipColor }]}>
@@ -128,7 +128,6 @@ export default class Tab extends React.Component {
     render() {
         return (
             <ScrollableTabView
-                scrollWithoutAnimation={true}
                 tabBarBackgroundColor="#444"
                 tabBarActiveTextColor="#FFF"
                 tabBarInactiveTextColor="#FFF"
