@@ -12,8 +12,9 @@ import { StackNavigator } from 'react-navigation'
 import CardStackStyleInterpolator from 'react-navigation/src/views/CardStackStyleInterpolator'
 
 import Home from './views/Home'
-import Chat from './views/Chat'
-import CNode from './views/CNode'
+import Chat from './views/chat'
+import CNode from './views/cnode'
+import CNodeTopic from './views/cnode/Topic'
 
 const Navigator = StackNavigator({
     Home: {
@@ -24,13 +25,9 @@ const Navigator = StackNavigator({
     },
     CNode: {
         screen: CNode,
-        navigationOptions: ({navigation}) => ({
-            title: 'CNode',
-            headerStyle: {
-                backgroundColor: '#444',
-                elevation: 0,
-            },
-        })
+    },
+    CNodeTopic: {
+        screen: CNodeTopic,
     },
 }, {
     transitionConfig: () => {

@@ -12,8 +12,8 @@ import {
 
 import ScrollableTabView, { DefaultTabBar } from 'react-native-scrollable-tab-view'
 import _ from 'lodash'
-import Utils from '../util'
-import service from '../service/cnode'
+import Utils from '../../util'
+import service from '../../service/cnode'
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList)
 
@@ -21,20 +21,25 @@ class TopicList extends React.PureComponent {
     state = {
         data: [],
         refreshing: true,
-        selected: new Map(),
     }
 
     _keyExtractor = (item, index) => item.id
 
+    fetchData = () => {
+        return new Promise((resolve, reject) => {
+            InteractionManager.runAfterInteractions(() => (
+                service.getTopics({
+                    tab: this.props.tab.toLowerCase(),
+                }).then(resolve).catch(reject)
+            ))
+        })
+    }
+
     componentDidMount() {
-        InteractionManager.runAfterInteractions(() => {
-            service.getTopics({
-                tab: this.props.tab.toLowerCase(),
-            }).then(res => {
-                this.setState({
-                    data: this.state.data.concat(res.data),
-                    refreshing: false,
-                })
+        this.fetchData().then(data => {
+            this.setState({
+                data: this.state.data.concat(data),
+                refreshing: false,
             })
         })
     }
@@ -80,20 +85,19 @@ class TopicList extends React.PureComponent {
     }
 
     _onPress = (item) => {
-        alert('onPress...')
+        this.props.navigation.navigate('CNodeTopic', {
+            id: item.id,
+            title: item.title,
+            // color: Utils.randomColor(),
+        })
     }
 
     _onRefresh = () => {
         this.setState({ refreshing: true })
-
-        InteractionManager.runAfterInteractions(() => {
-            service.getTopics({
-                tab: this.props.tab.toLowerCase(),
-            }).then(res => {
-                this.setState({
-                    data: res.data,
-                    refreshing: false,
-                })
+        this.fetchData().then(data => {
+            this.setState({
+                data,
+                refreshing: false,
             })
         })
     }
@@ -114,15 +118,23 @@ class TopicList extends React.PureComponent {
     }
 }
 
-export default class Tab extends React.Component {
-    renderTopics() {
+export default class CNode extends React.Component {
+    static navigationOptions = ({navigation}) => ({
+        title: 'CNode',
+        headerStyle: {
+            backgroundColor: '#444',
+            elevation: 0,
+        },
+    })
+
+    renderTopics = () => {
         return _.map({
             all: '全部',
             good: '精华',
             ask: '问答',
             share: '分享',
             job: '招聘',
-        }, (value, key) => <TopicList tab={key} tabLabel={value} />)
+        }, (value, key) => <TopicList tab={key} tabLabel={value} navigation={{...this.props.navigation}} />)
     }
 
     render() {
@@ -132,7 +144,7 @@ export default class Tab extends React.Component {
                 tabBarActiveTextColor="#FFF"
                 tabBarInactiveTextColor="#FFF"
                 tabBarUnderlineStyle={styles.underline}
-                renderTabBar={() => <DefaultTabBar style={{ elevation: 4 }} />}>
+                renderTabBar={() => <DefaultTabBar style={styles.tabBarStyle} />}>
                 {this.renderTopics()}
             </ScrollableTabView>
         )
@@ -145,14 +157,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#333',
     },
     item: {
-        padding: 10,
-        paddingTop: 20,
-        paddingBottom: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 15,
         borderBottomWidth: 1,
         borderColor: '#F8F8F8',
     },
     titleContainer: {
-        minHeight: 45,
+        minHeight: 42,
     },
     titleText: {
         paddingTop: 1,
@@ -191,6 +202,10 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
     },
     underline: {
-        backgroundColor: '#F8F8F8',
+        backgroundColor: '#eee',
+    },
+    tabBarStyle: {
+        elevation: 4,
+        borderBottomWidth: 0,
     },
 })

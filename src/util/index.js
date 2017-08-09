@@ -1,3 +1,5 @@
+import { toContent, toComment } from './cnode'
+
 const minute = 60 * 1000
 const hour = 60 * minute
 const day = 24 * hour
@@ -123,4 +125,6 @@ export default {
     isUrl,
     randomColor,
     getTip,
+    toContent,
+    toComment,
 }
