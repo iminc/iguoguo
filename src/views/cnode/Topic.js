@@ -1,6 +1,7 @@
 import React from 'react'
 import {
     WebView,
+    StyleSheet,
     ScrollView,
     Dimensions,
     InteractionManager,

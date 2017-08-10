@@ -85,7 +85,7 @@ class TopicList extends React.PureComponent {
     }
 
     _onPress = (item) => {
-        this.props.navigation.navigate('CNodeTopic', {
+        this.props.navigation.navigate('Topic', {
             id: item.id,
             title: item.title,
             // color: Utils.randomColor(),
