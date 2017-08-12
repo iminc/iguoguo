@@ -14,6 +14,7 @@ import ScrollableTabView, { DefaultTabBar } from 'react-native-scrollable-tab-vi
 import _ from 'lodash'
 import Utils from '../../util'
 import service from '../../service/cnode'
+import defaultStyles from '../../styles'
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList)
 
@@ -87,8 +88,7 @@ class TopicList extends React.PureComponent {
     _onPress = (item) => {
         this.props.navigation.navigate('Topic', {
             id: item.id,
-            title: item.title,
-            // color: Utils.randomColor(),
+            color: Utils.randomColor(),
         })
     }
 
@@ -122,7 +122,7 @@ export default class CNode extends React.Component {
     static navigationOptions = ({navigation}) => ({
         title: 'CNode',
         headerStyle: {
-            backgroundColor: '#444',
+            ...defaultStyles.headerStyle,
             elevation: 0,
         },
     })

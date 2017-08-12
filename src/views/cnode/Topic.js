@@ -10,14 +10,15 @@ import {
 import Loading from '../Loading'
 import Utils from '../../util'
 import service from '../../service/cnode'
+import defaultStyles from '../../styles'
 
 const { width, height } = Dimensions.get('window')
 
 export default class Topic extends React.PureComponent {
     static navigationOptions = ({ navigation }) => ({
-        title: navigation.state.params.title,
         headerStyle: {
-            backgroundColor: navigation.state.params.color || '#444',
+            ...defaultStyles.headerStyle,
+            backgroundColor: navigation.state.params.color,
             elevation: 0,
         },
     })
@@ -35,8 +36,8 @@ export default class Topic extends React.PureComponent {
         })
     }
 
-    onMessage = (data) => {
-        alert(data)
+    onMessage = (e) => {
+        alert(e.nativeEvent.data)
     }
 
     onLoad = () => {
@@ -45,23 +46,34 @@ export default class Topic extends React.PureComponent {
         })
     }
 
-    render() {
+    loadWebView = () => {
         const { data, color } = this.state
 
-        if (!data) {
-            return <Loading />
-        }
-
-        return (
-            <ScrollView contentContainerStyle={styles.contentContainer}>
+        if (data) {
+            return (
                 <WebView
                     ref={view => (this.webView = view)}
+                    style={styles.container}
                     onLoad={this.onLoad}
                     onMessage={this.onMessage}
                     domStorageEnabled={true}
-                    startInLoadingState={true}
-                    renderLoading={() => <Loading />}
+                    javaScriptEnabled={true}
                     source={{ html: Utils.toContent(data, color) }}/>
+            )
+        }
+    }
+
+    loading = () => {
+        if (this.state.loading) {
+            return <Loading />
+        }
+    }
+
+    render() {
+        return (
+            <ScrollView contentContainerStyle={styles.contentContainer}>
+                {this.loading()}
+                {this.loadWebView()}
             </ScrollView>
         )
     }
@@ -69,12 +81,10 @@ export default class Topic extends React.PureComponent {
 
 const styles = StyleSheet.create({
     contentContainer: {
-        minHeight: height - 80,
+        flex: 1,
     },
     container: {
         flex: 1,
-        width: width,
-        height: height,
-        backgroundColor: 'white',
+        zIndex: 1,
     },
 })

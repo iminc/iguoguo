@@ -26,6 +26,7 @@ const lazyImageScript = `
                 var scrolltop = document.documentElement.scrollTop || document.body.scrollTop;
                 $('#position').html(scrolltop);
             }).load(function() {
+                window.postMessage('onload')
                 $('img').each(function() {
                     var self = $(this),
                         uri = self.attr('data-src');
@@ -135,7 +136,7 @@ export function toContent(topic, titleColor = '#333') {
                         color: white;
                         border-radius: 3px;
                         opacity: 0.8;
-                        display: none;
+                        display: block;
                     }
                     img {
                         outline: none;
@@ -175,7 +176,7 @@ export function toContent(topic, titleColor = '#333') {
                 </style>
             </head>
             <body>
-                <div class="titleContainer" style="background-color: ${titleColor};display:none;">
+                <div class="titleContainer" style="background-color: ${titleColor};">
                     <div class="title">${encode(title)}</div>
                     <div class="topic-info">
                         <img src="${Utils.parseUrl(author.avatar_url)}" class="avatar" onclick="return false"/>
