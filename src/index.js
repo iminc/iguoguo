@@ -11,6 +11,7 @@ import CardStackStyleInterpolator from 'react-navigation/src/views/CardStackStyl
 
 import defaultStyles from './styles'
 
+import ImageView from './views/ImageView'
 import Home from './views/Home'
 import Chat from './views/chat'
 import CNode from './views/cnode'
@@ -28,6 +29,9 @@ const Navigator = StackNavigator({
     },
     Topic: {
         screen: Topic,
+    },
+    ImageView: {
+        screen: ImageView,
     },
 }, {
     transitionConfig: () => ({
@@ -49,8 +53,9 @@ const Navigator = StackNavigator({
     },
 })
 
+global.images = {}
 StatusBar.setTranslucent(true)
-StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.3)', true)
+StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.4)', true)
 
 export default class App extends React.Component {
     componentDidMount() {

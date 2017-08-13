@@ -2,47 +2,57 @@ import Utils from './index'
 
 const defaultImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC'
 
-const lazyImageScript = `
+const initScript = `
     <div id="position">0</div>
     <script type="text/javascript">
-        function sendMessage(message) {
-            WebViewBridge.send(message);
+        function sendMessage(command, payload) {
+            var message = {
+                command: command || '',
+                payload: payload || {}
+            };
+            window.postMessage(JSON.stringify(message));
         }
-        function loadImage(url, callback) {
-            var img = new Image();
-            img.src = url;
-            if(img.complete) {
-                callback.call(img);
-                return;
-            }
-            img.onload = function(){
-                img.onload = null;
-                callback.call(img);
-            }
+        function lazyloadImage() {
+            $('img.lazy').each(function() {
+                var self = $(this),
+                    url = self.attr('data-src'),
+                    coords = this.getBoundingClientRect();
+                if ((coords.top >= 0 && coords.left >= 0 && coords.top) <= (window.innerHeight || document.documentElement.clientHeight)) {
+                    var img = new Image();
+                    img.src = url;
+                    if (img.complete) {
+                        self.attr('src', url).removeClass('lazy');
+                        return;
+                    }
+                    img.onload = function() {
+                        img.onload = null;
+                        self.attr('src', url).removeClass('lazy');
+                    }
+                }
+            });
         }
         $(function() {
             FastClick.attach(document.body);
             $(window).scroll(function() {
-                var scrolltop = document.documentElement.scrollTop || document.body.scrollTop;
-                $('#position').html(scrolltop);
+                lazyloadImage();
+                /*var scrolltop = document.documentElement.scrollTop || document.body.scrollTop;
+                $('#position').html(scrolltop);*/
             }).load(function() {
-                window.postMessage('onload')
                 $('img').each(function() {
                     var self = $(this),
                         uri = self.attr('data-src');
                     if (self.attr('onclick') !== 'return false') {
-                        if (self.parent()[0].tagName !== 'A')
-                            self.attr('onclick', 'sendMessage("img:'+ uri +'")');
+                        if (self.parent()[0].tagName !== 'A') {
+                            self.attr('onclick', 'sendMessage("open-image", { uri: "' + uri + '" })');
+                        }
                     }
-                    loadImage(uri, function() {
-                        self.attr('src', uri).removeClass('lazy');
-                    });
                 });
                 $('a').each(function() {
                     var self = $(this),
                         href = self.attr('href');
-                    self.attr('onclick', 'sendMessage("href:'+ href +'")').removeAttr('href');
-                })
+                    self.attr('onclick', 'sendMessage("open-link", { uri: "' + href + '" })').removeAttr('href');
+                });
+                lazyloadImage();
             })
         })
     </script>
@@ -136,15 +146,17 @@ export function toContent(topic, titleColor = '#333') {
                         color: white;
                         border-radius: 3px;
                         opacity: 0.8;
-                        display: block;
+                        display: none;
                     }
                     img {
+                        opacity: 1;
+                        transition: opacity .5s;
                         outline: none;
                         -webkit-tap-highlight-color: transparent;
                         -webkit-touch-callout: none;
                         -webkit-user-select: none;
                     }
-                    a, a:link, a:active, a:visited {
+                    a, a:link, a:active, a:visited, a:focus {
                         text-decoration: none;
                         -webkit-tap-highlight-color: transparent;
                         -webkit-touch-callout: none;
@@ -169,9 +181,9 @@ export function toContent(topic, titleColor = '#333') {
                         color: #F8F8F8;
                     }
                     .lazy {
-                        width: 1000px;
+                        width: 100%;
                         height: 180px;
-                        opacity: 0.5;
+                        opacity: 0.3;
                     }
                 </style>
             </head>
@@ -191,7 +203,7 @@ export function toContent(topic, titleColor = '#333') {
                         </div>
                     </div>
                 </div>
-                ${lazyImageScript}
+                ${initScript}
             </body>
         <html>
     `
@@ -272,7 +284,7 @@ export function toComment(topic) {
                         -webkit-touch-callout: none;
                         -webkit-user-select: none;
                     }
-                    a, a:link, a:active, a:visited {
+                    a, a:link, a:active, a:visited, a:focus {
                         text-decoration: none;
                         -webkit-tap-highlight-color: transparent;
                         -webkit-touch-callout: none;
@@ -327,7 +339,7 @@ export function toComment(topic) {
                         <div class="panel">${content}</div>
                     </div>
                 </div>
-                ${lazyImageScript}
+                ${initScript}
             </body>
         <html>
     `

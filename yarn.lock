@@ -3749,6 +3749,22 @@ react-native-drawer-layout@1.3.2:
     entities "^1.1.1"
     htmlparser2-without-node-native "^3.9.0"
 
+react-native-image-pan-zoom@^2.0.6:
+  version "2.0.6"
+  resolved "http://registry.npm.taobao.org/react-native-image-pan-zoom/download/react-native-image-pan-zoom-2.0.6.tgz#93117d075dccd2f6b34009d70a4c17ae1a23f572"
+
+react-native-image-progress@^1.0.1:
+  version "1.0.1"
+  resolved "http://registry.npm.taobao.org/react-native-image-progress/download/react-native-image-progress-1.0.1.tgz#5ceb4cfefd39d7ebdffab802bc984b5a0fc41021"
+  dependencies:
+    prop-types "^15.5.10"
+
+react-native-progress@^3.3.0:
+  version "3.3.0"
+  resolved "http://registry.npm.taobao.org/react-native-progress/download/react-native-progress-3.3.0.tgz#da7a6942f44c42aed507576525d9e15cee1a7c2f"
+  dependencies:
+    prop-types "^15.5.8"
+
 react-native-scrollable-tab-view@^0.6.7:
   version "0.6.7"
   resolved "http://registry.npm.taobao.org/react-native-scrollable-tab-view/download/react-native-scrollable-tab-view-0.6.7.tgz#3a5fe8a4bd5bc7eb023f306099323bbd9cc284a2"

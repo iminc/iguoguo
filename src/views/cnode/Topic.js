@@ -1,9 +1,10 @@
 import React from 'react'
 import {
+    Linking,
     WebView,
     StyleSheet,
     ScrollView,
-    Dimensions,
+    ToastAndroid,
     InteractionManager,
 } from 'react-native'
 
@@ -11,8 +12,6 @@ import Loading from '../Loading'
 import Utils from '../../util'
 import service from '../../service/cnode'
 import defaultStyles from '../../styles'
-
-const { width, height } = Dimensions.get('window')
 
 export default class Topic extends React.PureComponent {
     static navigationOptions = ({ navigation }) => ({
@@ -23,10 +22,13 @@ export default class Topic extends React.PureComponent {
         },
     })
 
+    webView = null
+
     state = {
         data: null,
-        webView: null,
         loading: true,
+        imgSrc: null,
+        imgModalVisible: false,
     }
 
     componentDidMount() {
@@ -37,7 +39,20 @@ export default class Topic extends React.PureComponent {
     }
 
     onMessage = (e) => {
-        alert(e.nativeEvent.data)
+        const { command, payload } = JSON.parse(e.nativeEvent.data)
+        switch (command) {
+        case 'open-image':
+            this.props.navigation.navigate('ImageView', {
+                src: payload.uri,
+            })
+            break
+        case 'open-link':
+            Linking.openURL(payload.uri).catch(err => console.error('An error occurred', err))
+            break
+        default:
+            ToastAndroid.show(command)
+            break
+        }
     }
 
     onLoad = () => {
@@ -49,30 +64,28 @@ export default class Topic extends React.PureComponent {
     loadWebView = () => {
         const { data, color } = this.state
 
-        if (data) {
-            return (
-                <WebView
-                    ref={view => (this.webView = view)}
-                    style={styles.container}
-                    onLoad={this.onLoad}
-                    onMessage={this.onMessage}
-                    domStorageEnabled={true}
-                    javaScriptEnabled={true}
-                    source={{ html: Utils.toContent(data, color) }}/>
-            )
+        if (!data) {
+            return null
         }
-    }
 
-    loading = () => {
-        if (this.state.loading) {
-            return <Loading />
-        }
+        return (
+            <WebView
+                ref={view => { this.webView = view }}
+                style={styles.container}
+                onLoad={this.onLoad}
+                onMessage={this.onMessage}
+                domStorageEnabled={true}
+                javaScriptEnabled={true}
+                source={{ html: Utils.toContent(data, color) }}/>
+        )
     }
 
     render() {
+        const { loading } = this.state
+
         return (
             <ScrollView contentContainerStyle={styles.contentContainer}>
-                {this.loading()}
+                <Loading loading={loading}/>
                 {this.loadWebView()}
             </ScrollView>
         )
@@ -84,7 +97,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     container: {
-        flex: 1,
         zIndex: 1,
     },
 })
